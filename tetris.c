@@ -1,9 +1,10 @@
 /*******************************************************************************
  * Name        : tetris.c
  * Author      : Brandon Leung
- * Version     : 1.0.1
+ * Version     : 1.0.2
  * Date        : March 2, 2023
  * Description : An ASCII Art port of Tetris in C.
+ * TODO        : Preview, Settings, Hold, SRS, Leaderboards
  ******************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +13,6 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
-#include <curses.h>
 #include <ncurses.h>
 
 #define SPAWNCURSORX 5
@@ -29,6 +29,10 @@
 #define STARTINGLINES 0
 #define BLOCKEXISTS 1
 #define BLOCKABSENT 0
+#define TOTALROWS 21        // 20 + 1 (border row)
+#define ROWS 20
+#define TOTALCOLUMNS 13     // 10 + 2 (border row) + 1 (cursor row)
+#define COLUMNS 10
 
 int rowFlash0[13] = {1,1,0,0,0,0,0,0,0,0,0,0,1};
 int rowFlash1[13] = {1,1,1,1,1,1,1,1,1,1,1,1,1};
@@ -39,8 +43,6 @@ int score = STARTINGSCORE;
 int linesCleared = STARTINGLINES;
 int debugNumber1 = 0;
 int debugNumber2 = 0;
-int spawnCordX = 3;
-int spawnCordY = 0;
 int cursorX = 3;
 int cursorY = 0;
 int currNumOrientations;
@@ -151,6 +153,112 @@ int JPiece[4][4][4] = {{{0, 0, 0, 0},
                         {0, 0, 1, 0},
                         {0, 0, 0, 0}}};
 
+// int IPieceSRS[4][4][4] = {{{0, 0, 0, 0},
+//                            {1, 1, 1, 1},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 1, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 0, 0, 0},
+//                            {1, 1, 1, 1},
+//                            {0, 0, 0, 0}},
+//                           {{0, 1, 0, 0},
+//                            {0, 1, 0, 0},
+//                            {0, 1, 0, 0},
+//                            {0, 1, 0, 0}}};
+
+// int OPieceSRS[1][4][4] = {{{0, 0, 0, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 0, 0}}};
+
+// int TPieceSRS[4][4][4] = {{{0, 0, 1, 0},
+//                            {0, 1, 1, 1},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 1, 1, 1},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}}};
+
+// int SPieceSRS[4][4][4] = {{{0, 0, 1, 1},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 0, 1},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 0, 1},
+//                            {0, 0, 0, 0}}};
+
+// int ZPieceSRS[4][4][4] = {{{0, 1, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 1},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 1, 0, 0},
+//                            {0, 0, 0, 0}}};
+
+// int LPieceSRS[4][4][4] = {{{0, 0, 0, 1},
+//                            {0, 1, 1, 1},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 1, 1},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 1, 1, 1},
+//                            {0, 1, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 1, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}}};
+
+// int JPieceSRS[4][4][4] = {{{0, 1, 0, 0},
+//                            {0, 1, 1, 1},
+//                            {0, 0, 0, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 1},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 0, 0},
+//                            {0, 1, 1, 1},
+//                            {0, 0, 0, 1},
+//                            {0, 0, 0, 0}},
+//                           {{0, 0, 1, 0},
+//                            {0, 0, 1, 0},
+//                            {0, 1, 1, 0},
+//                            {0, 0, 0, 0}}};
 
 void initBoard() {
     for (int i = 0; i < 21; i++) {
@@ -217,25 +325,6 @@ void boardMapper() {
     }
 }
 
-void displayBoardNoMap() {
-    clear();
-    for (int i = 0; i < 20; i++) {
-        printw("<!");
-        for (int j = 2; j < 12; j++) {
-            if (tempBoardArr[i][j] == 0) {
-                printw(" .");
-            } else if (tempBoardArr[i][j] == 2) {
-                printw("==");
-            } else {
-                printw("[]");
-            }
-        }
-        printw("!>\n");
-    }
-    printw("<!====================!>\n%2d\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/%d|%d\n", debugNumber2, debugNumber1, level);
-    
-}
-
 void displayBoard() {
     clear();
     boardMapper();
@@ -252,6 +341,7 @@ void displayBoard() {
         }
         printw("!>\n");
     }
+    debugNumber1 = score;
     printw("<!====================!>\n%2d\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/%d|%d\n", debugNumber2, debugNumber1, level);
 }
 
@@ -312,7 +402,6 @@ void checkLines() {
         if (isLineComplete) {
             linesCleared++;
             currLinesCleared++;
-            //debugNumber2++;
             linesComplete[i] = 1;
         }
     }
@@ -334,11 +423,11 @@ void checkLines() {
     }
 }
 
-bool canMoveDown() {
+bool canMoveDown(int extra) {
     memcpy(testBoardArr, boardArr, sizeof(boardArr));
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            if (boardArr[cursorY + i][cursorX + j] == 1 && currPiece[currOrient][i][j] == 1) {
+            if (boardArr[cursorY + i + extra][cursorX + j] == 1 && currPiece[currOrient][i][j] == 1) {
                 return false;
             }
         }
@@ -372,7 +461,6 @@ bool canRotate() {
 
 void levelChecker() {
     if (goal == 2) {
-        
         if (linesCleared >= (level * 5) || level != 29) {
             level++;
         }
@@ -397,17 +485,59 @@ void movePiece(int key) {
             }
             break;
          
-        case 'w' :
+        case 'w':
             if (canRotate()) {
                 currOrient = (currOrient + 1) % currNumOrientations;
             }
             break;
         case 's':
-            if (canMoveDown()) {
+            if (canMoveDown(0)) {
                 elapsedTime = 0.0;
                 cursorY++;
             }
-            if (!canMoveDown()) {
+            if (!canMoveDown(0)) {
+                memcpy(boardArr, tempBoardArr, sizeof(tempBoardArr));
+                checkLines();
+                levelChecker();
+                spawnPiece(pieceGen());
+            }
+            break;
+        case ' ':
+            while (true) {
+                if (canMoveDown(1)) {
+                    elapsedTime = 0.0;
+                    cursorY++;
+                }
+                if (!canMoveDown(1)) {
+                    checkLines();
+                    levelChecker();
+                    break;
+                }
+                score = score + 2;
+            }
+            break;
+        case KEY_LEFT:
+            if (canMoveLR(-1)) {
+                cursorX--; 
+            }
+            break;
+        case KEY_RIGHT:
+            if (canMoveLR(1)) {
+                cursorX++;
+            }
+            break;
+         
+        case KEY_UP :
+            if (canRotate()) {
+                currOrient = (currOrient + 1) % currNumOrientations;
+            }
+            break;
+        case KEY_DOWN:
+            if (canMoveDown(0)) {
+                elapsedTime = 0.0;
+                cursorY++;
+            }
+            if (!canMoveDown(0)) {
                 memcpy(boardArr, tempBoardArr, sizeof(tempBoardArr));
                 checkLines();
                 levelChecker();
@@ -417,8 +547,6 @@ void movePiece(int key) {
      }   
     displayBoard(); 
 }
-
-
 
 void playGame() {
     srand(time(NULL));
