@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Name        : tetris.c
  * Author      : Brandon Leung
- * Version     : 0.0.0
- * Date        : February 25, 2023
+ * Version     : 1.0.1
+ * Date        : March 2, 2023
  * Description : An ASCII Art port of Tetris in C.
  ******************************************************************************/
 #include <stdio.h>
@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/time.h>
+#include <curses.h>
 #include <ncurses.h>
 
 #define SPAWNCURSORX 5
@@ -32,7 +33,7 @@
 int rowFlash0[13] = {1,1,0,0,0,0,0,0,0,0,0,0,1};
 int rowFlash1[13] = {1,1,1,1,1,1,1,1,1,1,1,1,1};
 int rowFlash2[13] = {1,1,2,2,2,2,2,2,2,2,2,2,1};
-int previewPiece
+int previewPiece;
 int fixedLinesRequired = 10;
 int score = STARTINGSCORE;
 int linesCleared = STARTINGLINES;
@@ -316,38 +317,7 @@ void checkLines() {
         }
     }
     if (isAnyComplete) {
-        // Commented code below is to provide a flashing effect on completed rows
-        // cant get the darn thing to work though. It pauses but the display never
-        // updates.
-        // for (int i = 0; i < 20; i++) {
-        //     if (linesComplete[i]) {
-        //         memcpy(tempBoardArr[i], rowFlash2, sizeof(rowFlash2));
-                
-        //         debugNumber2 = boardArr[i][5];
-        //     }
-        // }
-        // endwin();
-        // initscr();
-        
-        // displayBoardNoMap();
-        // usleep(1000000); // Wait for 1 second
-        
-        // for (int i = 0; i < 20; i++) {
-        //     if (linesComplete[i]) {
-        //         memcpy(boardArr[i], rowFlash1, sizeof(rowFlash1));
-        //     }
-        // }
-        // displayBoardNoMap(); 
-        // usleep(1000000);
-        //         for (int i = 0; i < 20; i++) {
-        //     if (linesComplete[i]) {
-        //         memcpy(boardArr[i], rowFlash0, sizeof(rowFlash0));
-        //     }
-        // }     
-        // displayBoardNoMap(); 
-        usleep(1000000 * currLinesCleared);
-        
-        
+        usleep(1000000 * currLinesCleared); // Game will halt 1 second per row cleared
         int j = 19;
         for (int i = 20; i >= 0; i--) {
             if (!linesComplete[i]) {
