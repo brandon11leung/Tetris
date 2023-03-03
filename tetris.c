@@ -122,19 +122,6 @@ int spawnPiece(int piece) {
     }
 }
 
-void initBoard() {
-    for (int i = 0; i < TOTALROWS; i++) {
-        for (int j = 0; j < TOTALCOLUMNS; j++) {
-            if (j < 2 || j == TOTALCOLUMNS - 1 || i == ROWS) {    // if row apart of the buffer (2 leftmost + 1 rightmost) or if its the bottom buffer row
-                boardArr[i][j] = 1;
-            } else {
-                boardArr[i][j] = 0;
-            }
-        }
-    }
-    memcpy(emptyBoardArr, boardArr, sizeof(boardArr));
-}
-
 void boardMapper() {
     memcpy(tempBoardArr, boardArr, sizeof(boardArr));
     for (int i = 0; i < PIECEDIMENSIONS; i++) {
