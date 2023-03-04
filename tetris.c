@@ -146,6 +146,8 @@ void displayBoard(int modifier) {
             } else if (tempBoardArr[i][j] == 2) { // legacy feature for now
                 printw("==");
             } else if (tempBoardArr[i][j] == 3) { // legacy feature for now
+                printw("++");
+            } else if (tempBoardArr[i][j] == 4) { // legacy feature for now
                 printw("--");
             } else {
                 printw("[]");
@@ -154,18 +156,19 @@ void displayBoard(int modifier) {
         printw("!>\n");
     }
     debugNumber1 = score;
+    debugNumber2 = level;
     printw("<!====================!>\n%2d\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/%d|%d\n", debugNumber2, debugNumber1, level);
 }
 
 void completionAnimation(int linesComplete[], int currLinesCleared) {
-    for (int i = 0; i < 4; i++) { 
+    for (int i = 0; i < 5; i++) { 
         for (int j = 0; j < ROWS; j++) {
             if (linesComplete[j]) {
                 memcpy(tempBoardArr[j], rowFlash[i], sizeof(rowFlash[i]));
             }
         }
         displayBoard(1);
-        clock_t flashDelay = clock() + .25 * CLOCKS_PER_SEC * currLinesCleared;  // half a second per block
+        clock_t flashDelay = clock() + .12 * CLOCKS_PER_SEC * currLinesCleared;  // half a second per block
         while (1) {
             if (clock() >= flashDelay) {
                 refresh();
@@ -345,7 +348,7 @@ void playGame() {
     int level = startLevel;
     int c;
     spawnPiece(pieceGen());
-    clock_t target = clock() + 1 * CLOCKS_PER_SEC;
+    clock_t target = clock() + gravityArr[level] * CLOCKS_PER_SEC;
     displayBoard(0);
     while (gameOver != true) {
         if ((c = getch()) != ERR) {
