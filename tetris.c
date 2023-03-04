@@ -38,6 +38,7 @@
 #define COLUMNS 10
 
 bool gameOver;
+bool hardDropLock = false;
 int previewPiece;
 int fixedLinesRequired = 10;
 int score = STARTINGSCORE;
@@ -84,6 +85,7 @@ char pieceGen() {
         int randNum = rand() % NUMOFPIECES;
         nextPiece = basePieceArr[randNum];
     }
+    hardDropLock = false;
     return nextPiece;
 }
 
@@ -266,12 +268,12 @@ bool canMoveDown(int extra) {
 void movePiece(int key) {
     switch (key) {
         case 'a':
-            if (canMoveLR(-1)) {
+            if (canMoveLR(-1) && !hardDropLock) {
                 cursorX--; 
             }
             break;
         case 'd':
-            if (canMoveLR(1)) {
+            if (canMoveLR(1) && !hardDropLock) {
                 cursorX++;
             }
             break;
@@ -293,25 +295,24 @@ void movePiece(int key) {
             }
             break;
         case ' ':
+            hardDropLock = true;
             while (true) {
                 if (canMoveDown(1)) {
-                    cursorY++;
+                    movePiece('s');
                 }
                 if (!canMoveDown(1)) {
-                    checkLines();
-                    levelChecker();
                     break;
                 }
                 score = score + 2;
             }
             break;
         case KEY_LEFT:
-            if (canMoveLR(-1)) {
+            if (canMoveLR(-1) && !hardDropLock) {
                 cursorX--; 
             }
             break;
         case KEY_RIGHT:
-            if (canMoveLR(1)) {
+            if (canMoveLR(1) && !hardDropLock) {
                 cursorX++;
             }
             break;
@@ -332,8 +333,8 @@ void movePiece(int key) {
                 spawnPiece(pieceGen());
             }
             break;
-     }
-    displayBoard(0); 
+    }
+    displayBoard(0);
 }
 
 void playGame() {
@@ -345,7 +346,6 @@ void playGame() {
     keypad(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     gameOver = false;
-    int level = startLevel;
     int c;
     spawnPiece(pieceGen());
     clock_t target = clock() + gravityArr[level] * CLOCKS_PER_SEC;
@@ -384,6 +384,7 @@ void initBoard() {
 void startingScreen() {
     printf("Please select what level you would like to start on (0-29): ");
     scanf("%d", &startLevel);
+    level = startLevel;
     printf("\n1: Normal\n2: Zen\n3: Randomized\nPlease select what mode you would like to play: ");
     scanf("%d", &mode);
     printf("\nPlease select how many pieces you would like to be able to preview (0-5): ");
