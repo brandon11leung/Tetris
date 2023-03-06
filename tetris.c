@@ -170,7 +170,7 @@ void completionAnimation(int linesComplete[], int currLinesCleared) {
             }
         }
         displayBoard(1);
-        clock_t flashDelay = clock() + .12 * CLOCKS_PER_SEC * currLinesCleared;  // half a second per block
+        clock_t flashDelay = clock() + .12 * CLOCKS_PER_SEC * 1.1// currLinesCleared;  // half a second per block
         while (1) {
             if (clock() >= flashDelay) {
                 refresh();
@@ -353,7 +353,7 @@ void playGame() {
     while (gameOver != true) {
         if ((c = getch()) != ERR) {
             if (level > 7) {
-                target = clock() + gravityArr[level] * CLOCKS_PER_SEC;
+                target = clock() + .15 * CLOCKS_PER_SEC;
             }
             if (c  == 's') {
                 score++;
