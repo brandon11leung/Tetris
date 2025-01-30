@@ -1,8 +1,8 @@
 /*******************************************************************************
  * Name        : tetris.c
  * Author      : Brandon Leung
- * Version     : 1.1.0
- * Date        : March 2, 2023
+ * Version     : 1.1.1
+ * Date        : January 30, 2025
  * Description : An ASCII Art port of Tetris in C.
  * TODO        : Preview, Settings, Hold, SRS, Leaderboards, Restructure
  ******************************************************************************/
@@ -170,7 +170,7 @@ void completionAnimation(int linesComplete[], int currLinesCleared) {
             }
         }
         displayBoard(1);
-        clock_t flashDelay = clock() + .12 * CLOCKS_PER_SEC * 1.1// currLinesCleared;  // half a second per block
+        clock_t flashDelay = clock() + .12 * CLOCKS_PER_SEC * 1.1;// currLinesCleared;  // half a second per block
         while (1) {
             if (clock() >= flashDelay) {
                 refresh();
