@@ -82,8 +82,14 @@ char pieceGen() {
         nextPiece = tempPieceArr[i];
         tempPieceArr[i] = 'X';
     } else {
-        int randNum = rand() % NUMOFPIECES;
-        nextPiece = basePieceArr[randNum];
+        int randNum;
+        if (tempPieceArr[0] == NULL) {
+            randNum = rand() % NUMOFPIECES;
+            tempPieceArr[0] = basePieceArr[randNum];
+        }
+        randNum = rand() % NUMOFPIECES;
+        nextPiece = tempPieceArr[0];
+        tempPieceArr[0] = basePieceArr[randNum];
     }
     hardDropLock = false;
     return nextPiece;
@@ -159,7 +165,7 @@ void displayBoard(int modifier) {
     }
     debugNumber1 = score;
     debugNumber2 = level;
-    printw("<!====================!>\n%2d\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/%d|%d\n", debugNumber2, debugNumber1, level);
+    printw("<!====================!>\n%2d\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/%d|%c\n", debugNumber2, debugNumber1, tempPieceArr[0]);
 }
 
 void completionAnimation(int linesComplete[], int currLinesCleared) {
